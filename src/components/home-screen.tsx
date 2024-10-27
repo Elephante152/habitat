@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { config } from 'dotenv';
+config();
 import { Search, Droplet, Wind, Tag, Calendar } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +77,8 @@ type Suggestion = string;
 
 const FormField = FormFieldType as any;
 
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -84,7 +88,7 @@ export default function HomeScreen() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showExtendedForecast, setShowExtendedForecast] = useState(false);
   const [showBusinessForm, setShowBusinessForm] = useState(false);
-  const [isCelsius, setIsCelsius] = useState(false);
+  const [isCelsius, setIsCelsius] = useState(true); // Default to Celsius for consistency
   const [activeTab, setActiveTab] = useState('forecast');
   const [weatherCondition, setWeatherCondition] = useState('clear');
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
@@ -119,38 +123,65 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [searchQuery]);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     if (query.trim() === '') {
       return;
     }
 
-    const conditions = ['clear', 'clouds', 'rain', 'snow'];
-    const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
-    
-    setWeatherData({
-      city: query,
-      temperature: Math.floor(Math.random() * 30) + 10,
-      humidity: Math.floor(Math.random() * 60) + 40,
-      windSpeed: Math.floor(Math.random() * 20) + 1,
-      condition: randomCondition
-    });
+    try {
+      // Fetch current weather data from OpenWeatherMap API
+      const weatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=${isCelsius ? 'metric' : 'imperial'}`
+      );
+      const weatherData = await weatherResponse.json();
 
-    setWeatherCondition(randomCondition);
+      if (weatherResponse.ok && weatherData && weatherData.main) {
+        setWeatherData({
+          city: weatherData.name,
+          temperature: Math.round(weatherData.main.temp),
+          humidity: weatherData.main.humidity,
+          windSpeed: Math.round(weatherData.wind.speed),
+          condition: weatherData.weather[0].main.toLowerCase(),
+        });
 
-    setForecast([
-      { date: 'Mon', temp: 70, condition: 'Sunny' },
-      { date: 'Tue', temp: 72, condition: 'Partly Cloudy' },
-      { date: 'Wed', temp: 68, condition: 'Cloudy' },
-      { date: 'Thu', temp: 65, condition: 'Rainy' },
-      { date: 'Fri', temp: 70, condition: 'Sunny' },
-    ]);
+        setWeatherCondition(weatherData.weather[0].main.toLowerCase());
+      } else {
+        console.error('Error fetching weather data:', weatherData.message);
+        setWeatherData(null);
+      }
+
+      // Fetch 5-day forecast data from OpenWeatherMap API
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${query}&appid=${API_KEY}&units=${isCelsius ? 'metric' : 'imperial'}`
+      );
+      const forecastData = await forecastResponse.json();
+
+      if (forecastResponse.ok && forecastData && forecastData.list) {
+        const formattedForecast = forecastData.list
+          .filter((item: any) => item.dt_txt.includes('12:00:00')) // Use consistent times for daily data
+          .slice(0, 5)
+          .map((item: any) => ({
+            date: new Date(item.dt_txt).toLocaleDateString('en-US', { weekday: 'short' }),
+            temp: Math.round(item.main.temp),
+            condition: item.weather[0].main.toLowerCase(),
+          }));
+        setForecast(formattedForecast);
+      } else {
+        console.error('Error fetching forecast data:', forecastData.message);
+        setForecast([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      setWeatherData(null);
+      setForecast([]);
+    }
 
     setNeighborhoods(['Downtown', 'West End', 'Kitsilano', 'Mount Pleasant', 'Gastown']);
-
     setSelectedNeighborhood('');
     setBusinesses([]);
     setShowSuggestions(false);
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -162,28 +193,28 @@ export default function HomeScreen() {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSearch(searchQuery);
     }
-  }
+  };
 
   const handleSuggestionClick = (suggestion: string) => {
     setSearchQuery(suggestion);
     handleSearch(suggestion);
-  }
+  };
 
   const handleSubmitBusiness = (data: FormValues) => {
     console.log('Business submitted:', data);
     setShowBusinessForm(false);
-  }
+  };
 
   const handleNeighborhoodSelect = (neighborhood: string) => {
     setSelectedNeighborhood(neighborhood);
     setShowUnlockAnimation(true);
-    
+
     setBusinesses([
       { name: 'Cafe Habitat', type: 'restaurant', neighborhood: neighborhood, discountHours: '2PM - 4PM', discountPercentage: 50, discountMethod: 'Special menu for Habitat users' },
       { name: 'Eco Grocers', type: 'retail', neighborhood: neighborhood, discountHours: '7PM - 9PM', discountPercentage: 15, discountMethod: 'Discount applied at checkout' },
@@ -191,19 +222,19 @@ export default function HomeScreen() {
     ]);
 
     setTimeout(() => setShowUnlockAnimation(false), 2000);
-  }
+  };
 
   const convertTemperature = (temp: number) => {
-    if (isCelsius) {
-      return Math.round((temp - 32) * 5 / 9);
-    }
-    return temp;
+  if (isCelsius) {
+    return Math.round(temp);
   }
+  return Math.round((temp * 9) / 5 + 32);
+};
 
   const formatTemperature = (temp: number) => {
-    const convertedTemp = convertTemperature(temp);
-    return `${convertedTemp}°${isCelsius ? 'C' : 'F'}`;
-  }
+  const convertedTemp = convertTemperature(temp);
+  return `${convertedTemp}°${isCelsius ? 'C' : 'F'}`;
+};
 
   return (
     <div className={`min-h-screen p-8 relative overflow-hidden transition-colors duration-1000 ${
@@ -228,9 +259,9 @@ export default function HomeScreen() {
           <div className="absolute inset-0">
             <div className="flex justify-around absolute w-full">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="text-5xl animate-rain" style={{animationDelay: `${i * 0.1}s`}}>
-                  💧
-                </div>
+                <div key={i} className="text-5xl animate-rain" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 1.5 + 1.5}s` }}>
+  💧
+</div>
               ))}
             </div>
           </div>
@@ -239,9 +270,9 @@ export default function HomeScreen() {
           <div className="absolute inset-0">
             <div className="flex justify-around absolute w-full">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="text-5xl animate-snow" style={{animationDelay: `${i * 0.1}s`}}>
-                  ❄️
-                </div>
+                <div key={i} className="text-5xl animate-snow" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 2 + 2}s` }}>
+  ❄️
+</div>
               ))}
             </div>
           </div>
@@ -340,7 +371,7 @@ export default function HomeScreen() {
                 </div>
                 <div className="flex items-center">
                   <Wind className="mr-1 h-4 w-4" />
-                  Wind: {weatherData.windSpeed} mph
+                  Wind: {weatherData.windSpeed} {isCelsius ? 'm/s' : 'mph'}
                 </div>
               </div>
             </CardContent>
@@ -369,13 +400,13 @@ export default function HomeScreen() {
                   <h3 className="text-lg font-semibold mb-4">5-Day Forecast</h3>
                   <div className="grid grid-cols-5 gap-4">
                     {forecast.map((day, index) => (
-                      <div key={index}   className="text-center">
+                      <div key={index} className="text-center">
                         <div className="font-bold">{day.date}</div>
                         <div className="text-2xl my-2">
-                          {day.condition === 'Sunny' && '️'}
-                          {day.condition === 'Partly Cloudy' && '⛅'}
-                          {day.condition === 'Cloudy' && '☁️'}
-                          {day.condition === 'Rainy' && '🌧️'}
+                          {day.condition === 'clear' && '☀️'}
+                          {day.condition === 'clouds' && '☁️'}
+                          {day.condition === 'rain' && '🌧️'}
+                          {day.condition === 'snow' && '❄️'}
                         </div>
                         <div>{formatTemperature(day.temp)}</div>
                       </div>

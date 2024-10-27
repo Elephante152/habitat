@@ -20,15 +20,13 @@ FormControl.displayName = "FormControl";
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof Label>,
   React.ComponentPropsWithoutRef<typeof Label>
->(({ className, ...props }, ref) => {
-  return (
-    <Label
-      ref={ref}
-      className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
-      {...props}
-    />
-  );
-});
+>(({ className, ...props }, ref) => (
+  <Label
+    ref={ref}
+    className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
+    {...props}
+  />
+));
 FormLabel.displayName = "FormLabel";
 
 const FormField = ({
