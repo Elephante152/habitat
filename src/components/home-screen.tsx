@@ -30,7 +30,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-// Define your form schema
 const formSchema = z.object({
   businessName: z.string(),
   businessType: z.string(),
@@ -43,17 +42,17 @@ const formSchema = z.object({
   discountMethod: z.string(),
 });
 
-// Infer the type from the schema
+
 type FormValues = z.infer<typeof formSchema>;
 
-// Add this type definition at the top of the file
+
 type ForecastItem = {
   date: string;
   temp: number;
   condition: string;
 };
 
-// Add this type definition at the top of the file
+
 type WeatherData = {
   city: string;
   temperature: number;
@@ -62,7 +61,7 @@ type WeatherData = {
   condition: string;
 };
 
-// Add this type definition at the top of the file
+
 type Business = {
   name: string;
   type: string;
@@ -72,7 +71,7 @@ type Business = {
   discountMethod: string;
 };
 
-// At the top of the file, add or update this type definition:
+
 type Suggestion = string;
 
 const FormField = FormFieldType as any;
@@ -94,6 +93,7 @@ export default function HomeScreen() {
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
   const [showUnlockAnimation, setShowUnlockAnimation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -107,6 +107,7 @@ export default function HomeScreen() {
       setWeatherCondition('clear');
       setNeighborhoods([]);
       setSelectedNeighborhood('');
+      setErrorMessage(null);
     }
   }, [searchQuery]);
 
@@ -145,9 +146,11 @@ export default function HomeScreen() {
         });
 
         setWeatherCondition(weatherData.weather[0].main.toLowerCase());
+        setErrorMessage(null);
       } else {
         console.error('Error fetching weather data:', weatherData.message);
         setWeatherData(null);
+        setErrorMessage('City not found. Please check the spelling or try another city.');
       }
 
       // Fetch 5-day forecast data from OpenWeatherMap API
@@ -166,15 +169,18 @@ export default function HomeScreen() {
             condition: item.weather[0].main.toLowerCase(),
           }));
         setForecast(formattedForecast);
+        setErrorMessage(null);
       } else {
         console.error('Error fetching forecast data:', forecastData.message);
         setForecast([]);
+        setErrorMessage('The city either does not exist or is not supported.');
       }
 
     } catch (error) {
       console.error('Error fetching weather data:', error);
       setWeatherData(null);
       setForecast([]);
+      setErrorMessage('An error occurred while fetching data. Please try again later.');
     }
 
     setNeighborhoods(['Downtown', 'West End', 'Kitsilano', 'Mount Pleasant', 'Gastown']);
@@ -225,16 +231,16 @@ export default function HomeScreen() {
   };
 
   const convertTemperature = (temp: number) => {
-  if (isCelsius) {
-    return Math.round(temp);
-  }
-  return Math.round((temp * 9) / 5 + 32);
-};
+    if (isCelsius) {
+      return Math.round(temp);
+    }
+    return Math.round((temp * 9) / 5 + 32);
+  };
 
   const formatTemperature = (temp: number) => {
-  const convertedTemp = convertTemperature(temp);
-  return `${convertedTemp}°${isCelsius ? 'C' : 'F'}`;
-};
+    const convertedTemp = convertTemperature(temp);
+    return `${convertedTemp}°${isCelsius ? 'C' : 'F'}`;
+  };
 
   return (
     <div className={`min-h-screen p-8 relative overflow-hidden transition-colors duration-1000 ${
@@ -260,8 +266,8 @@ export default function HomeScreen() {
             <div className="flex justify-around absolute w-full">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="text-5xl animate-rain" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 1.5 + 1.5}s` }}>
-  💧
-</div>
+                  💧
+                </div>
               ))}
             </div>
           </div>
@@ -271,8 +277,8 @@ export default function HomeScreen() {
             <div className="flex justify-around absolute w-full">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="text-5xl animate-snow" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 2 + 2}s` }}>
-  ❄️
-</div>
+                  ❄️
+                </div>
               ))}
             </div>
           </div>
@@ -314,6 +320,12 @@ export default function HomeScreen() {
             </ul>
           )}
         </div>
+
+        {errorMessage && (
+          <div className="max-w-md mx-auto mb-4 text-red-500 text-center">
+            {errorMessage}
+          </div>
+        )}
 
         {neighborhoods.length > 0 && (
           <div className="max-w-md mx-auto mb-8">
