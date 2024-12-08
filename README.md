@@ -1,145 +1,155 @@
-# Habitat Weather App
+# Habitat Weather App – Mobile Version
 
-Welcome to the Habitat Weather App! This project is built using [Next.js](https://nextjs.org) and provides real-time weather information along with neighborhood discounts for businesses. The application allows users to search for weather forecasts and discover local businesses offering discounts based on neighborhood selection.
+Welcome to the Habitat Weather App – now transitioned into a mobile-first Android app using Expo and React Native. This project integrates weather forecasts via the OpenWeather API and provides local neighborhood discounts.
 
-## Features
+The journey involved resolving issues during the setup with Expo, Android SDK, and TailwindCSS integration. This README documents the features, challenges, and the steps taken to ensure project functionality.
 
-- **Real-time Weather Data**: Integrates with OpenWeatherMap API to provide current weather and a 5-day forecast.
-- **Neighborhood Discounts**: Users can explore discounts offered by local businesses in selected neighborhoods.
-- **Temperature Unit Toggle**: Switch between Celsius and Fahrenheit.
-- **Interactive Animations**: Background animations change depending on the current weather conditions (sunny, rainy, snowy, cloudy).
+**Project Highlights**
 
-## Project Structure
+Real-time Weather Data: Fetches current weather and a 5-day forecast using the OpenWeatherMap API.
 
-The project follows a modular approach, with components organized for reusability and scalability:
+Neighborhood Discounts: Allows users to discover local businesses offering discounts.
 
-- **src/app/components/ui/**: Houses reusable UI components such as buttons, cards, inputs, and forms.
-- **src/app/components/layouts/**: Contains layout components to structure the page.
-- **src/app/home-screen.tsx**: The main entry point for the Home Screen, containing logic for fetching weather data and rendering the main UI.
-- **public/**: Contains static assets such as images.
+Responsive Design: Implemented with NativeWind, a TailwindCSS solution for React Native.
 
-## Prerequisites
+Dynamic Animations: Background animations reflect weather conditions (rain, snow, sunny).
 
-To run this project locally, ensure you have the following installed:
+Navigation: Managed using React Navigation for smooth screen transitions.
 
-- **Node.js** (version 14 or later)
-- **npm** (version 6 or later) or **yarn**
-- An API key from [OpenWeatherMap](https://openweathermap.org/api) (to fetch real-time weather data)
+**Project Evolution and Challenges**
 
-## Getting Started
+Original Version: Web-Based Next.js Application
+The project initially used Next.js for web development. Key features such as weather API integration and TailwindCSS styling were implemented successfully.
 
-1. Clone the repository:
+Migration to Mobile: React Native and Expo
 
-   ```bash
-   git clone https://github.com/Elephante152/habitat
-   cd habitat
-   ```
+The project was migrated to React Native using Expo to adapt it for Android mobile development. During the transition, the following challenges arose:
 
-2. Install dependencies:
+1. Android SDK Configuration Issues
+Problem: Expo could not locate the Android SDK path (spawn adb ENOENT error).
+Solution: Installed the Android SDK via Android Studio and set the ANDROID_HOME and PATH variables in .zshrc.
 
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+2. TailwindCSS Parsing Errors
+Problem: ESLint threw parsing errors for tailwind.config.ts as it was not included in tsconfig.json.
+Solution: Updated tsconfig.json to explicitly include tailwind.config.ts and fixed the ESLint configuration.
 
-3. Set up your environment variables by creating a `.env.local` file in the root of the project:
+3. Next.js Dependencies
+Problem: Leftover browser-specific dependencies (e.g., next, react-dom) caused build failures.
+Solution: Removed unused dependencies and reorganized the project to align with Expo and React Native standards.
 
-   ```
-   NEXT_PUBLIC_OPENWEATHER_API_KEY=your_openweathermap_api_key
-   ```
+4. EAS Build Failures
+Problem: Builds using Expo Application Services (EAS) failed due to misconfigured file paths.
+Solution: Resolved file structure issues by ensuring App.js is the root entry point.
 
-   Replace `your_openweathermap_api_key` with your OpenWeatherMap API key.
+**Features**
 
-4. Run the development server:
+Weather Search: Enter a city name to fetch real-time weather data.
+Neighborhood Discounts: View business listings and discounts based on location.
+Interactive Animations: Background dynamically reflects the current weather.
+Navigation: Uses React Navigation for smooth transitions between screens.
 
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+**Prerequisites**
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ensure the following tools are installed:
 
-## Application Usage
+Node.js (version 16 or higher)
+Expo CLI (latest version)
+Android Studio (to run the Android emulator or AVD)
+OpenWeatherMap API Key (Get your API Key)
 
-- **Weather Search**: Enter the name of a city to get the current weather and 5-day forecast.
-- **Neighborhood Discounts**: Select a neighborhood to view available business discounts.
-- **Business Listing Form**: Businesses can list their information using the integrated form to provide discounts for app users.
+**Setup Instructions**
 
-## Animations
+1. Clone the Repository
+git clone https://github.com/Elephante152/habitat-mobile-android
+cd habitat-mobile-android
 
-- The background changes dynamically based on the current weather conditions (e.g., clear, clouds, rain, snow).
-- **Raindrop and Snowflake Animations**: These are randomized in their positions and animations to create a more natural effect.
+2. Install Dependencies
+npm install
 
-## Environment Variables
+3. Set Environment Variables
 
-This project uses environment variables to manage API keys. The API key for OpenWeatherMap is stored in `.env.local`, which is listed in `.gitignore` to keep sensitive information private.
+Create a .env file in the root directory:
 
-```
-NEXT_PUBLIC_OPENWEATHER_API_KEY=22b7b7ccb7bfcf1c5f472de875640990
-```
+env
+OPENWEATHER_API_KEY=your_openweathermap_api_key
+Replace your_openweathermap_api_key with your API key.
 
-Make sure you do not commit your API key to version control by adding `.env.local` to `.gitignore`.
+4. Run the Development Server
 
-## Folder Structure
+To run on Android:
+npx expo start
+Press a to open on an Android emulator.
 
-```plaintext
-├── .next               # Compiled output
-├── node_modules        # Dependencies
-├── public              # Static assets
-├── src
-│   ├── app
-│   │   ├── components  # UI components
-│   │   ├── layouts     # Layout components
-│   │   └── home-screen.tsx  # Main application screen
-├── .env.local          # Environment variables
-├── package.json        # Project metadata and dependencies
-└── README.md           # Project documentation
-```
+Alternatively, scan the QR code using the Expo Go app on your Android device.
 
-## Technologies Used
+**Folder Structure**
 
-- **Next.js**: Framework for building the app.
-- **React Hook Form**: Handling form states and validation.
-- **OpenWeatherMap API**: Provides real-time weather data.
-- **Tailwind CSS**: For styling and responsive design.
-- **TypeScript**: Adds static typing to JavaScript, enhancing maintainability.
+habitat-mobile-android/
+├── assets/                # Static assets (icons, images)
+├── src/
+│   ├── app/               # Global styles and layouts
+│   ├── components/        # Reusable UI components
+│   ├── lib/               # Utility functions
+│   ├── navigation/        # Navigation setup
+│   └── screens/           # App screens (Home, Discounts)
+├── App.js                 # Root entry file
+├── tailwind.config.ts     # TailwindCSS configuration for NativeWind
+├── tsconfig.json          # TypeScript configuration
+├── package.json           # Dependencies and scripts
+└── README.md              # Project documentation
 
-## Custom Scripts
+**Technologies Used**
 
-To ease development, the following scripts are available:
+Expo: Framework for developing cross-platform React Native apps.
+React Native: Mobile development framework.
+NativeWind: TailwindCSS implementation for React Native.
+React Navigation: For in-app navigation.
+OpenWeatherMap API: For fetching weather data.
 
-- **`npm run dev`**: Runs the development server.
-- **`npm run build`**: Builds the application for production.
-- **`npm run start`**: Starts the production build.
-- **`npm run lint`**: Runs ESLint to catch potential code issues.
+**Known Issues**
 
-## Error Handling and Troubleshooting
+EAS Build Stability:
+Builds occasionally fail due to inconsistencies in the environment or Expo configuration. Additional testing is needed for long-term stability.
 
-- Ensure you have a valid **OpenWeatherMap API Key**.
-- If temperature conversions seem incorrect, verify the temperature unit toggle and API unit settings.
-- If the weather animations do not appear correctly, check for CSS styles and ensure Tailwind CSS is installed and configured properly.
+Android-Specific Testing:
+Primary testing has been conducted on emulators, with limited physical device testing.
 
-## Deployment
+API Key Management:
+Ensure the .env file is properly configured, and sensitive keys are not committed to version control.
 
-The recommended deployment platform is [Vercel](https://vercel.com/), which seamlessly integrates with Next.js projects. For detailed deployment instructions, see the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
+**Testing**
 
-## Contributing
+Local Testing:
 
-Contributions are welcome! Please follow these steps:
+Use npx expo start and test on the Android emulator or a physical device using Expo Go.
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/your-feature-name`).
-5. Create a Pull Request.
+EAS Build Testing:
 
-## License
+To create a production-ready build for Android:
+
+eas build --platform android --profile preview
+
+**Future Improvements**
+
+Error Handling: Add better API error handling and fallback UI for failed requests.
+Enhanced UI: Improve the UI for a smoother user experience across all devices.
+iOS Compatibility: Extend testing and deployment to iOS devices.
+Unit Testing: Implement unit tests for components and API integration.
+
+**Contributing**
+
+I welcome contributions to improve the project. Follow these steps:
+
+Fork the repository.
+Create a feature branch (git checkout -b feature/your-feature-name).
+Commit changes (git commit -am "Add feature XYZ").
+Push the branch (git push origin feature/your-feature-name).
+Submit a pull request.
+
+**License**
 
 This project is licensed under the MIT License.
 
-## Contact
+**Contact**
 
-For any questions or feedback, please reach out or visit [https://shaunsaini.com].
-
+For questions, feedback, or collaboration opportunities, visit https://shaunsaini.com.

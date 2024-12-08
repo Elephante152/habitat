@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { config } from 'dotenv';
-config();
+import Constants from 'expo-constants';
 import { Search, Droplet, Wind, Tag, Calendar } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -14,21 +13,21 @@ import {
   FormField as FormFieldType,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
-import { useForm, ControllerRenderProps } from "react-hook-form";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectItem, SelectContent } from "@/components/ui/select";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from '@/components/ui/form';
+import { useForm, ControllerRenderProps } from 'react-hook-form';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 const formSchema = z.object({
   businessName: z.string(),
@@ -76,7 +75,7 @@ type Suggestion = string;
 
 const FormField = FormFieldType as any;
 
-const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+const API_KEY = Constants.manifest.extra.OPENWEATHER_API_KEY;
 
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -251,21 +250,21 @@ export default function HomeScreen() {
     }`}>
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {weatherCondition === 'clear' && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-9xl animate-float">☀️</div>
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <div className='text-9xl animate-float'>☀️</div>
           </div>
         )}
         {weatherCondition === 'clouds' && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-9xl animate-float">☁️</div>
-            <div className="text-9xl animate-float animation-delay-1000 ml-24">⛅</div>
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <div className='text-9xl animate-float'>☁️</div>
+            <div className='text-9xl animate-float animation-delay-1000 ml-24'>⛅</div>
           </div>
         )}
         {weatherCondition === 'rain' && (
-          <div className="absolute inset-0">
-            <div className="flex justify-around absolute w-full">
+          <div className='absolute inset-0'>
+            <div className='flex justify-around absolute w-full'>
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="text-5xl animate-rain" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 1.5 + 1.5}s` }}>
+                <div key={i} className='text-5xl animate-rain' style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 1.5 + 1.5}s` }}>
                   💧
                 </div>
               ))}
@@ -273,10 +272,10 @@ export default function HomeScreen() {
           </div>
         )}
         {weatherCondition === 'snow' && (
-          <div className="absolute inset-0">
-            <div className="flex justify-around absolute w-full">
+          <div className='absolute inset-0'>
+            <div className='flex justify-around absolute w-full'>
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="text-5xl animate-snow" style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 2 + 2}s` }}>
+                <div key={i} className='text-5xl animate-snow' style={{ animationDelay: `${Math.random() * 2}s`, left: `${Math.random() * 100}%`, animationDuration: `${Math.random() * 2 + 2}s` }}>
                   ❄️
                 </div>
               ))}
@@ -291,27 +290,27 @@ export default function HomeScreen() {
         <div className="max-w-md mx-auto mb-8">
           <div className="relative">
             <Input
-              type="text"
-              placeholder="Search for a city"
+              type='text'
+              placeholder='Search for a city'
               value={searchQuery}
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
-              className="w-full pl-10 pr-16 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className='w-full pl-10 pr-16 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400' />
             <Button
               onClick={() => handleSearch(searchQuery)}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full w-10 h-10 p-0 bg-primary hover:bg-primary/90 transition-shadow duration-200 ease-in-out hover:shadow-lg"
+              className='absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full w-10 h-10 p-0 bg-primary hover:bg-primary/90 transition-shadow duration-200 ease-in-out hover:shadow-lg'
             >
-              <Search className="h-5 w-5 text-primary-foreground" />
+              <Search className='h-5 w-5 text-primary-foreground' />
             </Button>
           </div>
           {showSuggestions && suggestions.length > 0 && (
-            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded-lg shadow-lg">
+            <ul className='absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded-lg shadow-lg'>
               {suggestions.map((suggestion, index) => (
                 <li
                   key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  className='px-4 py-2 hover:bg-gray-100 cursor-pointer'
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {suggestion}
@@ -322,7 +321,7 @@ export default function HomeScreen() {
         </div>
 
         {errorMessage && (
-          <div className="max-w-md mx-auto mb-4 text-red-500 text-center">
+          <div className='max-w-md mx-auto mb-4 text-red-500 text-center'>
             {errorMessage}
           </div>
         )}
@@ -331,7 +330,7 @@ export default function HomeScreen() {
           <div className="max-w-md mx-auto mb-8">
             <Select onValueChange={handleNeighborhoodSelect} value={selectedNeighborhood}>
               <SelectTrigger>
-                {selectedNeighborhood || "Select a neighborhood"}
+                {selectedNeighborhood || 'Select a neighborhood'}
               </SelectTrigger>
               <SelectContent>
                 {neighborhoods.map((neighborhood) => (

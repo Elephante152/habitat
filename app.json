@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "5fccf78a-b248-42d9-84ed-e337855ab71a"
+      }
+    },
+    "android": {
+      "package": "com.shaun152.habitat"
+    }
+  }
+}
